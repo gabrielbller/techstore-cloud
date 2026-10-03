@@ -21,6 +21,9 @@ param appServiceSku string = 'F1'
 @description('Versão do .NET no App Service.')
 param dotnetVersion string = '10.0'
 
+@description('E-mail que recebe os alertas de monitoramento.')
+param alertEmail string
+
 @description('Subject OIDC do GitHub autorizado a fazer deploy (repo:dono@id/repo@id:ref:refs/heads/main).')
 param githubSubject string
 
@@ -195,6 +198,45 @@ resource apiDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-previe
     workspaceId: logAnalytics.id
     logs: [ { categoryGroup: 'allLogs', enabled: true } ]
     metrics: [ { category: 'AllMetrics', enabled: true } ]
+  }
+}
+
+// Alerta: mais de 5 erros HTTP 5xx em 5 minutos na API -> e-mail.
+resource actionGroup 'Microsoft.Insights/actionGroups@2023-01-01' = {
+  name: 'ag-techstore'
+  location: 'global'
+  tags: tags
+  properties: {
+    groupShortName: 'techstore'
+    enabled: true
+    emailReceivers: [ { name: 'email', emailAddress: alertEmail, useCommonAlertSchema: true } ]
+  }
+}
+
+resource alertaErros 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+  name: 'API com erros 5xx'
+  location: 'global'
+  tags: tags
+  properties: {
+    severity: 2
+    enabled: true
+    scopes: [ api.id ]
+    evaluationFrequency: 'PT5M'
+    windowSize: 'PT5M'
+    criteria: {
+      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
+      allOf: [
+        {
+          name: 'erros-5xx'
+          criterionType: 'StaticThresholdCriterion'
+          metricName: 'Http5xx'
+          operator: 'GreaterThan'
+          threshold: 5
+          timeAggregation: 'Total'
+        }
+      ]
+    }
+    actions: [ { actionGroupId: actionGroup.id } ]
   }
 }
 

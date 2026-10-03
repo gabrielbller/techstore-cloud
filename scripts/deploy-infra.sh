@@ -25,6 +25,7 @@ GITHUB_SUBJECT="$(gh api "repos/$GITHUB_REPO" --jq '"repo:\(.owner.login)@\(.own
 echo "==> Implantando infra/main.bicep"
 az deployment group create -g "$RESOURCE_GROUP" -n techstore -f infra/main.bicep \
   -p adminIp="$(curl -s https://api.ipify.org)" sqlAdminPassword="$SQL_ADMIN_PASSWORD" githubSubject="$GITHUB_SUBJECT" \
+     alertEmail="$(az account show --query user.name -o tsv)" \
   --query properties.outputs -o json > .saidas.json
 
 saida() { python3 -c "import json; print(json.load(open('.saidas.json'))['$1']['value'])"; }
