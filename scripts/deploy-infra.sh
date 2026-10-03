@@ -19,9 +19,12 @@ fi
 echo "==> Resource group $RESOURCE_GROUP ($LOCATION)"
 az group create -n "$RESOURCE_GROUP" -l "$LOCATION" --tags projeto=techstore-cloud ambiente=mvp -o none
 
+# O GitHub identifica o repositório por IDs imutáveis no token OIDC.
+GITHUB_SUBJECT="$(gh api "repos/$GITHUB_REPO" --jq '"repo:\(.owner.login)@\(.owner.id)/\(.name)@\(.id):ref:refs/heads/main"')"
+
 echo "==> Implantando infra/main.bicep"
 az deployment group create -g "$RESOURCE_GROUP" -n techstore -f infra/main.bicep \
-  -p adminIp="$(curl -s https://api.ipify.org)" sqlAdminPassword="$SQL_ADMIN_PASSWORD" githubRepo="$GITHUB_REPO" \
+  -p adminIp="$(curl -s https://api.ipify.org)" sqlAdminPassword="$SQL_ADMIN_PASSWORD" githubSubject="$GITHUB_SUBJECT" \
   --query properties.outputs -o json > .saidas.json
 
 saida() { python3 -c "import json; print(json.load(open('.saidas.json'))['$1']['value'])"; }

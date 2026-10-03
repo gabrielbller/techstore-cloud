@@ -21,8 +21,8 @@ param appServiceSku string = 'F1'
 @description('Versão do .NET no App Service.')
 param dotnetVersion string = '10.0'
 
-@description('Repositório GitHub autorizado a fazer deploy (OIDC).')
-param githubRepo string = 'gabrielbller/techstore-cloud'
+@description('Subject OIDC do GitHub autorizado a fazer deploy (repo:dono@id/repo@id:ref:refs/heads/main).')
+param githubSubject string
 
 var sufixo = substring(uniqueString(resourceGroup().id), 0, 6)
 var tags = {
@@ -210,7 +210,7 @@ resource githubCredential 'Microsoft.ManagedIdentity/userAssignedIdentities/fede
   name: 'github-main'
   properties: {
     issuer: 'https://token.actions.githubusercontent.com'
-    subject: 'repo:${githubRepo}:ref:refs/heads/main'
+    subject: githubSubject
     audiences: [ 'api://AzureADTokenExchange' ]
   }
 }
