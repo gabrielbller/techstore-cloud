@@ -1,0 +1,12 @@
+bin/
+obj/
+publish/
+TestResults/
+.vs/
+.vscode/
+.idea/
+.DS_Store
+
+# Valores locais do deploy (senha do SQL, endereços)
+.env.local
+.saidas.json

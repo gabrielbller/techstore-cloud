@@ -1,0 +1,11 @@
+# SQL Server local para desenvolvimento (a API usa appsettings.Development.json).
+# Em Macs Apple Silicon a imagem roda via emulação amd64 (Rosetta).
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Dev_Local_123!"
+    ports:
+      - "1433:1433"

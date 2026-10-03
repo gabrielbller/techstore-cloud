@@ -1,0 +1,25 @@
+// Consultas KQL usadas no Log Analytics (workspace log-techstore).
+
+// 1. Requisições da API: volume e latência p95 por rota (Application Insights)
+AppRequests
+| where TimeGenerated > ago(24h)
+| summarize Total = count(), P95_ms = percentile(DurationMs, 95) by Name, ResultCode
+| order by Total desc
+
+// 2. Chamadas da API ao Azure SQL
+AppDependencies
+| where TimeGenerated > ago(24h) and Type == "SQL"
+| summarize Chamadas = count(), Media_ms = avg(DurationMs) by Target
+
+// 3. CPU e memória da VM (Azure Monitor Agent)
+Perf
+| where TimeGenerated > ago(6h)
+| where CounterName in ("% Processor Time", "% Used Memory")
+| summarize Media = avg(CounterValue) by bin(TimeGenerated, 5m), CounterName
+| render timechart
+
+// 4. Logs do serviço da API e do Caddy na VM
+Syslog
+| where ProcessName in ("techstore-api", "caddy")
+| project TimeGenerated, ProcessName, SeverityLevel, SyslogMessage
+| order by TimeGenerated desc

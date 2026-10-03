@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TechStore Cloud · Cadastro de Produtos</title>
+  <meta name="description" content="MVP do cadastro de produtos digitais da TechStore Cloud, hospedado no Azure Blob Storage (static website).">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b5cd5'/%3E%3Cpath d='M9 11h14M16 11v12' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topo">
+    <div class="marca">
+      <span class="logo" aria-hidden="true">T</span>
+      <div>
+        <h1>TechStore Cloud</h1>
+        <p>Cadastro de produtos digitais</p>
+      </div>
+    </div>
+    <div class="topo-acoes">
+      <span id="status-api" class="status" role="status">Verificando API…</span>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <section class="barra" aria-label="Filtros">
+      <label class="campo campo--busca">
+        <span class="sr-only">Buscar</span>
+        <input id="busca" type="search" placeholder="Buscar por nome ou SKU" autocomplete="off">
+      </label>
+      <button id="btn-novo" class="botao" type="button">Novo produto</button>
+    </section>
+
+    <section class="painel" aria-live="polite">
+      <div class="tabela-wrapper">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th scope="col">SKU</th>
+              <th scope="col">Produto</th>
+              <th scope="col">Categoria</th>
+              <th scope="col" class="num">Preço</th>
+              <th scope="col" class="num">Estoque</th>
+              <th scope="col"><span class="sr-only">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody id="lista-produtos"></tbody>
+        </table>
+      </div>
+      <p id="vazio" class="vazio" hidden>Nenhum produto encontrado.</p>
+      <footer class="paginacao"><span id="resumo"></span></footer>
+    </section>
+  </main>
+
+  <dialog id="dlg-produto" class="dialogo">
+    <form id="form-produto" method="dialog" novalidate>
+      <h2 id="dlg-titulo">Novo produto</h2>
+      <div class="grade">
+        <label class="campo">SKU
+          <input name="sku" required maxlength="40" placeholder="EBOOK-AZ-002">
+        </label>
+        <label class="campo">Categoria
+          <input name="categoria" required maxlength="60" placeholder="E-books">
+        </label>
+        <label class="campo campo--largo">Nome
+          <input name="nome" required maxlength="120">
+        </label>
+        <label class="campo campo--largo">Descrição
+          <textarea name="descricao" rows="3" maxlength="1000"></textarea>
+        </label>
+        <label class="campo">Preço (R$)
+          <input name="preco" type="number" min="0.01" step="0.01" required>
+        </label>
+        <label class="campo">Estoque
+          <input name="estoque" type="number" min="0" step="1" required>
+        </label>
+      </div>
+      <p id="form-erro" class="erro" role="alert" hidden></p>
+      <div class="dialogo-acoes">
+        <button class="botao botao--secundario" value="cancelar" formnovalidate>Cancelar</button>
+        <button id="btn-salvar" class="botao" value="salvar">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+
+  <div id="aviso" class="aviso" role="status" hidden></div>
+</body>
+</html>
